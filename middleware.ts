@@ -7,6 +7,10 @@ const allowedOrigins = (process.env.ALLOWED_ORIGINS ?? "")
   .map(origin => origin.trim())
   .filter(Boolean);
 
+if (process.env.VERCEL_URL) {
+  allowedOrigins.push(`https://${process.env.VERCEL_URL}`);
+}
+
 export function middleware(req: NextRequest) {
   const userAgent = req.headers.get("user-agent") ?? "";
   const origin = req.headers.get("origin") ?? "";
@@ -21,6 +25,7 @@ export function middleware(req: NextRequest) {
     allowedOrigins.some(o => referer.startsWith(o));
 
   if (!isAllowed) {
+    console.warn(`Unauthorized access from origin: ${origin}`);
     return new NextResponse("Unauthorized access", { status: 403 });
   }
 
@@ -28,5 +33,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/api/visitors", "/api/visitors/:path*"],
+  matcher: ["/api/visitors/:path*"],
 };

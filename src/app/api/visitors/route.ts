@@ -1,22 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-const ALLOWED_ORIGINS =
-  process.env.ALLOWED_ORIGINS?.split(",").map(o => o.trim()) || [];
-
 export async function POST(req: Request) {
   try {
-    const origin = req.headers.get("origin") || "";
-    const referer = req.headers.get("referer") || "";
-
-    const isAllowed =
-      ALLOWED_ORIGINS.some(o => origin.startsWith(o)) ||
-      ALLOWED_ORIGINS.some(o => referer.startsWith(o));
-
-    if (!isAllowed) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-    }
-
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown-ip";
     const userAgent = req.headers.get("user-agent") || "unknown";
 
