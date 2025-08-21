@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 
 const allowedOrigins = (process.env.ALLOWED_ORIGINS ?? "")
   .split(",")
-  .map(origin => origin.trim().replace(/\/$/, "")) // 🚀 strip trailing /
+  .map(origin => origin.trim().replace(/\/$/, "")) 
   .filter(Boolean);
 
 if (process.env.VERCEL_URL) {
@@ -13,7 +13,7 @@ if (process.env.VERCEL_URL) {
 
 export function middleware(req: NextRequest) {
   const userAgent = req.headers.get("user-agent") ?? "";
-  const origin = (req.headers.get("origin") ?? "").replace(/\/$/, ""); // 🚀 normalize
+  const origin = (req.headers.get("origin") ?? "").replace(/\/$/, "");
 
   if (req.method === "OPTIONS") {
     return new NextResponse(null, {

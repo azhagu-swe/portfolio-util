@@ -33,15 +33,32 @@ export async function POST(req: Request) {
       _sum: { visitCount: true },
     });
 
-    return NextResponse.json({
-      uniqueVisitors,
-      totalVisits: totalVisits._sum.visitCount || 0,
-    });
+    return NextResponse.json(
+      {
+        uniqueVisitors,
+        totalVisits: totalVisits._sum.visitCount || 0,
+      },
+      {
+        headers: {
+          "Access-Control-Allow-Origin": req.headers.get("origin") || "*",
+          "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        },
+      }
+    );
   } catch (error) {
     console.error("Visitor API Error:", error);
+
     return NextResponse.json(
       { error: "Failed to track visitor" },
-      { status: 500 }
+      {
+        status: 500,
+        headers: {
+          "Access-Control-Allow-Origin": req.headers.get("origin") || "*",
+          "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        },
+      }
     );
   }
 }
