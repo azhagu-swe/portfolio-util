@@ -14,22 +14,30 @@ if (process.env.VERCEL_URL) {
 export function middleware(req: NextRequest) {
   const userAgent = req.headers.get("user-agent") ?? "";
   const origin = req.headers.get("origin") ?? "";
-  const referer = req.headers.get("referer") ?? "";
+
+  if (req.method === "OPTIONS") {
+    return new NextResponse(null, {
+      headers: {
+        "Access-Control-Allow-Origin": allowedOrigins.includes(origin) ? origin : "null",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      },
+    });
+  }
 
   if (isBot(userAgent)) {
     return new NextResponse("Bot traffic ignored", { status: 403 });
   }
 
-  const isAllowed =
-    allowedOrigins.some(o => origin.startsWith(o)) ||
-    allowedOrigins.some(o => referer.startsWith(o));
-
+  const isAllowed = allowedOrigins.some(o => origin.startsWith(o));
   if (!isAllowed) {
     console.warn(`Unauthorized access from origin: ${origin}`);
     return new NextResponse("Unauthorized access", { status: 403 });
   }
 
-  return NextResponse.next();
+  const res = NextResponse.next();
+  res.headers.set("Access-Control-Allow-Origin", origin);
+  return res;
 }
 
 export const config = {
